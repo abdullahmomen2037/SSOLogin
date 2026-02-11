@@ -2,7 +2,12 @@
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddAuthentication()    
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = "Cookies";
+    options.DefaultChallengeScheme = "Google";
+})
+.AddCookie("Cookies")
 .AddGoogle(options =>
 {
     options.ClientId = "77149603508-q299m1v1q93hkbev1o0q88q7sf58deds.apps.googleusercontent.com";

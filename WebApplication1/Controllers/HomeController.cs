@@ -12,17 +12,14 @@ namespace WebApplication1.Controllers
         {
             return View();
         }
-
         public IActionResult Privacy()
         {
             return View();
         }
-
         public IActionResult Login()
         {
             return View();
         }
-
         // ✅ Redirect to Google
         [HttpPost]
         public IActionResult GoogleLogin()
@@ -31,21 +28,21 @@ namespace WebApplication1.Controllers
             var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
             return Challenge(properties, "Google");
         }
-
         // ✅ Google callback
-        public IActionResult GoogleResponse()
+        public async Task<IActionResult> GoogleResponse()
         {
-            // Get claims from the current user context
-            var claims = User.Claims.ToList();
+            var result = await HttpContext.AuthenticateAsync("Cookies");
+            if (!result.Succeeded)
+                return RedirectToAction("Login");
+            var claims = result.Principal.Claims.ToList();
             ViewBag.Email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             ViewBag.Name = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
-
             return View("Profile");
         }
-
         // ✅ Logout
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
+            await HttpContext.SignOutAsync("Cookies");
             return RedirectToAction("Index");
         }
 
