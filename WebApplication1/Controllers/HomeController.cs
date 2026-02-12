@@ -26,17 +26,23 @@ namespace WebApplication1.Controllers
         {
             var redirectUrl = Url.Action("GoogleResponse", "Home");
             var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
-            return Challenge(properties, "Google");
+
+            return Challenge(properties, "oidc"); // NOT Google
         }
+
         // ✅ Google callback
         public async Task<IActionResult> GoogleResponse()
         {
             var result = await HttpContext.AuthenticateAsync("Cookies");
-            if (!result.Succeeded)
+            var token = await HttpContext.GetTokenAsync("id_token");
+            var accessToken = await HttpContext.GetTokenAsync("access_token");
+
+                     
+                  if (!result.Succeeded)
                 return RedirectToAction("Login");
             var claims = result.Principal.Claims.ToList();
             ViewBag.Email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-            ViewBag.Name = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            ViewBag.Name = claims.FirstOrDefault(c => c.Type == "name")?.Value;
             return View("Profile");
         }
         // ✅ Logout

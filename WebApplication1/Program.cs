@@ -5,14 +5,24 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = "Cookies";
-    options.DefaultChallengeScheme = "Google";
+    options.DefaultChallengeScheme = "oidc";
 })
-.AddCookie("Cookies")
-.AddGoogle(options =>
+.AddCookie()
+.AddOpenIdConnect("oidc", options =>
 {
+    options.Authority = "https://accounts.google.com";
     options.ClientId = "77149603508-q299m1v1q93hkbev1o0q88q7sf58deds.apps.googleusercontent.com";
     options.ClientSecret = "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";
+
+    options.ResponseType = "code";
+    options.Scope.Add("openid");
+    options.Scope.Add("profile");
+    options.Scope.Add("email");
+
+    options.SaveTokens = true;
 });
+
+
 
 var app = builder.Build();
 
